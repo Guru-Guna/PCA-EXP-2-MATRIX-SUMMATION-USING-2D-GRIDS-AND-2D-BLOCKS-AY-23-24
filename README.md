@@ -1,10 +1,12 @@
-<H1 ALIGN=CENTER> MATRIX SUMMATION USING 2D GRIDS AND 2D BLOCKS </H1>
-<H3> NAME : Gunaseelan G </H3>
-<H3> REGISTER NUMBER : 212221230031 </H3>
-<H3>EXPERIMENT NO : 02 </H3>
-<H3>DATE  : 13.03.2024 </H3>
-<h2> <align=center> MATRIX SUMMATION WITH A 2D GRID AND 2D BLOCKS </h2>
+# PCA-EXP-2-Matrix-Summation-using-2D-Grids-and-2D-Blocks-AY-23-24
+<h3>ENTER YOUR NAME: Gunaseelan G </h3>
+<h3>ENTER YOUR REGISTER NO: 212221230031</h3>
+<h3>EX. NO: 02</h3>
+<h3>DATE:</h3>
+<h1> <align=center> MATRIX SUMMATION WITH A 2D GRID AND 2D BLOCKS </h3>
 i.  Use the file sumMatrixOnGPU-2D-grid-2D-block.cu
+
+    
 ii. Matrix summation with a 2D grid and 2D blocks. Adapt it to integer matrix addition. Find the best execution configuration. </h3>
 
 ## AIM:
@@ -12,10 +14,7 @@ To perform  matrix summation with a 2D grid and 2D blocks and adapting it to int
 
 ## EQUIPMENTS REQUIRED:
 Hardware – PCs with NVIDIA GPU & CUDA NVCC
-
 Google Colab with NVCC Compiler
-
-
 
 
 ## PROCEDURE:
@@ -34,8 +33,8 @@ Google Colab with NVCC Compiler
 12.	Reset the device: Reset the device using cudaDeviceReset to ensure that all resources are cleaned up before the program exits.
 
 ## PROGRAM:
-```PYTHON
-%%cuda
+```
+%%cuda 
 #include <cuda_runtime.h>
 #include <stdio.h>
 #include <sys/time.h>
@@ -115,24 +114,32 @@ inline double seconds()
 #endif // _COMMON_H
 
 
-void initialData(float *ip, const int size)
+
+/*
+ * This example demonstrates a simple vector sum on the GPU and on the host.
+ * sumArraysOnGPU splits the work of the vector sum across CUDA threads on the
+ * GPU. A 2D thread block and 2D grid are used. sumArraysOnHost sequentially
+ * iterates through vector elements on the host.
+ */
+
+void initialData(int *ip, const int size)
 {
     int i;
 
     for(i = 0; i < size; i++)
     {
-        ip[i] = (float)(rand() & 0xFF) / 10.0f;
+        ip[i] = (int)(rand() & 0xFF) / 10.0f;
     }
 
     return;
 }
 
-void sumMatrixOnHost(float *A, float *B, float *C, const int nx,
+void sumMatrixOnHost(int *A, int *B, int *C, const int nx,
                      const int ny)
 {
-    float *ia = A;
-    float *ib = B;
-    float *ic = C;
+    int *ia = A;
+    int *ib = B;
+    int *ic = C;
 
     for (int iy = 0; iy < ny; iy++)
     {
@@ -151,7 +158,7 @@ void sumMatrixOnHost(float *A, float *B, float *C, const int nx,
 }
 
 
-void checkResult(float *hostRef, float *gpuRef, const int N)
+void checkResult(int *hostRef, int *gpuRef, const int N)
 {
     double epsilon = 1.0E-8;
     bool match = 1;
@@ -161,7 +168,7 @@ void checkResult(float *hostRef, float *gpuRef, const int N)
         if (abs(hostRef[i] - gpuRef[i]) > epsilon)
         {
             match = 0;
-            printf("host %f gpu %f\n", hostRef[i], gpuRef[i]);
+            printf("host %d gpu %d\n", hostRef[i], gpuRef[i]);
             break;
         }
     }
@@ -173,7 +180,7 @@ void checkResult(float *hostRef, float *gpuRef, const int N)
 }
 
 // grid 2D block 2D
-__global__ void sumMatrixOnGPU2D(float *A, float *B, float *C, int NX, int NY)
+__global__ void sumMatrixOnGPU2D(int *A, int *B, int *C, int NX, int NY)
 {
     unsigned int ix = blockIdx.x * blockDim.x + threadIdx.x;
     unsigned int iy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -205,11 +212,11 @@ int main(int argc, char **argv)
     printf("Matrix size: nx %d ny %d\n", nx, ny);
 
     // malloc host memory
-    float *h_A, *h_B, *hostRef, *gpuRef;
-    h_A = (float *)malloc(nBytes);
-    h_B = (float *)malloc(nBytes);
-    hostRef = (float *)malloc(nBytes);
-    gpuRef = (float *)malloc(nBytes);
+    int *h_A, *h_B, *hostRef, *gpuRef;
+    h_A = (int *)malloc(nBytes);
+    h_B = (int *)malloc(nBytes);
+    hostRef = (int *)malloc(nBytes);
+    gpuRef = (int *)malloc(nBytes);
 
     // initialize data at host side
     double iStart = seconds();
@@ -228,7 +235,7 @@ int main(int argc, char **argv)
     printf("sumMatrixOnHost elapsed %f sec\n", iElaps);
 
     // malloc device global memory
-    float *d_MatA, *d_MatB, *d_MatC;
+    int *d_MatA, *d_MatB, *d_MatC;
     CHECK(cudaMalloc((void **)&d_MatA, nBytes));
     CHECK(cudaMalloc((void **)&d_MatB, nBytes));
     CHECK(cudaMalloc((void **)&d_MatC, nBytes));
@@ -275,11 +282,15 @@ int main(int argc, char **argv)
 
     return (0);
 }
+
 ```
 
 ## OUTPUT:
-![1 (2)](https://github.com/Vineesh-AI-DS/PCA-EXP-2-MATRIX-SUMMATION-USING-2D-GRIDS-AND-2D-BLOCKS-AY-23-24/assets/93427254/41c505c0-afdc-4e94-8af1-6965235faef5)
+### FLOAT:
+![image](https://github.com/ShamRathan/PCA-EXP-2-MATRIX-SUMMATION-USING-2D-GRIDS-AND-2D-BLOCKS-AY-23-24/assets/93587823/6097dafb-1baf-4c1e-aa0b-cac44d515734)
 
+### INTEGER:
+![image](https://github.com/ShamRathan/PCA-EXP-2-MATRIX-SUMMATION-USING-2D-GRIDS-AND-2D-BLOCKS-AY-23-24/assets/93587823/e976b8c5-8d12-43cc-8175-e5b850a17b96)
 
 ## RESULT:
-The host took 0.835959 seconds to complete it’s computation, while the GPU outperforms the host and completes the computation in 0.053757 seconds. Therefore, float variables in the GPU will result in the best possible result. Thus, matrix summation using 2D grids and 2D blocks has been performed successfully.
+The host took 0.833230 seconds to complete it’s computation, while the GPU outperforms the host and completes the computation in 0.049779 seconds. Therefore, float variables in the GPU will result in the best possible result. Thus, matrix summation using 2D grids and 2D blocks has been performed successfully.
